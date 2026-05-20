@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>PED 2014/68/EU — Pressure Equipment Category Classifier</title>
+  <meta name="description" content="PED 2014/68/EU pressure equipment category classifier based on Annex II, Tables 1–8. Vessels and piping — Categories I to IV."/>
+  <style>
+    :root{
+      --bg:#0a0e14;
+      --nav:#0d1219;
+      --panel:#111923;
+      --panel2:#0f1520;
+      --border:#1e2d42;
+      --text:#e8edf5;
+      --muted:#8a9ab5;
+      --orange:#f5820a;
+      --orange2:#ff9d2f;
+      --orange-dim:rgba(245,130,10,.12);
+      --orange-border:rgba(245,130,10,.35);
+      --red:#e84040;
+      --green:#2ecc89;
+      --blue:#4a9eff;
+      --yellow:#f0b030;
+      --radius:6px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+      background:var(--bg);color:var(--text);line-height:1.55;min-height:100vh;
+      font-size:15px;
+    }
+    a{color:inherit;text-decoration:none}
+
+    /* ── NAV ── */
+    .nav{
+      position:sticky;top:0;z-index:100;
+      background:var(--nav);
+      border-bottom:2px solid var(--orange);
+    }
+    .nav-inner{
+      max-width:1100px;margin:0 auto;padding:0 24px;
+      display:flex;align-items:center;gap:24px;height:56px;
+    }
+    .logo{
+      display:flex;align-items:center;gap:12px;
+      font-weight:700;font-size:17px;letter-spacing:.5px;
+    }
+    .logo-icon{
+      width:36px;height:36px;border-radius:4px;
+      background:var(--orange);
+      display:grid;place-items:center;
+      font-weight:900;font-size:14px;color:#0a0e14;
+      letter-spacing:0;
+    }
+    .logo-sub{
+      font-size:11px;font-weight:400;color:var(--muted);
+      letter-spacing:.3px;text-transform:uppercase;display:block;margin-top:1px;
+    }
+    .nav-divider{flex:1}
+    .nav-tag{
+      font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;
+      padding:5px 10px;border:1px solid var(--border);border-radius:4px;
+    }
+
+    /* ── HERO ── */
+    .hero{
+      background:linear-gradient(135deg,#0d1219 0%,#0a0e14 60%);
+      border-bottom:1px solid var(--border);
+      padding:44px 0 36px;
+    }
+    .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+    .hero h1{
+      font-size:clamp(22px,3vw,34px);font-weight:700;
+      letter-spacing:.2px;margin-bottom:8px;
+    }
+    .hero h1 span{color:var(--orange)}
+    .hero-sub{color:var(--muted);max-width:68ch;font-size:15px}
+    .hero-meta{
+      display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;
+    }
+    .tag{
+      display:inline-flex;align-items:center;gap:6px;
+      font-size:12px;padding:5px 10px;border-radius:4px;
+      background:rgba(255,255,255,.04);border:1px solid var(--border);
+      color:var(--muted);letter-spacing:.2px;
+    }
+    .tag .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .dot-orange{background:var(--orange)}
+    .dot-green{background:var(--green)}
+
+    /* ── GRID INFOS ── */
+    .info-strip{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+      gap:1px;background:var(--border);
+      margin:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+    }
+    .info-cell{
+      background:var(--panel);padding:16px 20px;
+    }
+    .info-cell h3{
+      font-size:11px;color:var(--orange);letter-spacing:.6px;
+      text-transform:uppercase;font-weight:700;margin-bottom:6px;
+    }
+    .info-cell p{font-size:13px;color:var(--muted);line-height:1.6}
+
+    /* ── MAIN LAYOUT ── */
+    .main-layout{
+      max-width:1100px;margin:0 auto;padding:28px 24px;
+      display:grid;grid-template-columns:1fr 420px;gap:24px;align-items:start;
+    }
+
+    /* ── FORM ── */
+    .panel{
+      background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+      overflow:hidden;
+    }
+    .panel-head{
+      padding:14px 20px;
+      background:var(--panel2);
+      border-bottom:1px solid var(--border);
+      display:flex;align-items:center;gap:10px;
+    }
+    .panel-head h2{font-size:14px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--muted)}
+    .panel-head .accent-bar{width:3px;height:18px;background:var(--orange);border-radius:2px;flex-shrink:0}
+    .panel-body{padding:20px}
+
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{
+      font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+      color:var(--muted);
+    }
+    .field select,.field input[type=number]{
+      background:#070b10;
+      border:1px solid var(--border);border-radius:var(--radius);
+      color:var(--text);padding:10px 12px;font-size:14px;
+      font-family:inherit;outline:none;
+      transition:border-color .15s;
+      -moz-appearance:textfield;width:100%;
+    }
+    .field input[type=number]::-webkit-outer-spin-button,
+    .field input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+    .field select:focus,.field input:focus{border-color:var(--orange)}
+    .field-full{grid-column:1/-1}
+
+    .separator{height:1px;background:var(--border);margin:16px 0}
+
+    .btn-classify{
+      width:100%;padding:13px;border-radius:var(--radius);
+      background:var(--orange);color:#0a0e14;
+      font-weight:700;font-size:15px;letter-spacing:.3px;
+      border:none;cursor:pointer;font-family:inherit;
+      transition:background .15s,filter .15s;
+    }
+    .btn-classify:hover{background:var(--orange2)}
+
+    /* ── RESULT ── */
+    .result-panel{display:none}
+    .result-panel.show{display:block}
+
+    .cat-banner{
+      padding:18px 20px;
+      border-left:4px solid;
+      display:flex;align-items:flex-start;gap:16px;
+    }
+    .cat-banner.b-out  {border-color:var(--muted);background:rgba(138,154,181,.06)}
+    .cat-banner.b-sep  {border-color:var(--green); background:rgba(46,204,137,.06)}
+    .cat-banner.b-cat1 {border-color:var(--blue);  background:rgba(74,158,255,.06)}
+    .cat-banner.b-cat2 {border-color:var(--yellow);background:rgba(240,176,48,.06)}
+    .cat-banner.b-cat3 {border-color:var(--orange);background:rgba(245,130,10,.06)}
+    .cat-banner.b-cat4 {border-color:var(--red);   background:rgba(232,64,64,.06)}
+
+    .cat-icon{
+      width:48px;height:48px;border-radius:4px;flex-shrink:0;
+      display:grid;place-items:center;font-size:22px;font-weight:900;
+    }
+    .b-out  .cat-icon{background:rgba(138,154,181,.15);color:var(--muted)}
+    .b-sep  .cat-icon{background:rgba(46,204,137,.15); color:var(--green)}
+    .b-cat1 .cat-icon{background:rgba(74,158,255,.15); color:var(--blue)}
+    .b-cat2 .cat-icon{background:rgba(240,176,48,.15); color:var(--yellow)}
+    .b-cat3 .cat-icon{background:rgba(245,130,10,.15); color:var(--orange)}
+    .b-cat4 .cat-icon{background:rgba(232,64,64,.15);  color:var(--red)}
+
+    .cat-text h3{font-size:18px;font-weight:700;margin-bottom:4px}
+    .b-out  .cat-text h3{color:var(--muted)}
+    .b-sep  .cat-text h3{color:var(--green)}
+    .b-cat1 .cat-text h3{color:var(--blue)}
+    .b-cat2 .cat-text h3{color:var(--yellow)}
+    .b-cat3 .cat-text h3{color:var(--orange)}
+    .b-cat4 .cat-text h3{color:var(--red)}
+    .cat-text p{font-size:13px;color:var(--muted)}
+
+    .result-body{padding:16px 20px;border-top:1px solid var(--border)}
+    .params-row{
+      display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;
+    }
+    .param-chip{
+      font-size:12px;padding:4px 10px;border-radius:3px;
+      background:#070b10;border:1px solid var(--border);color:var(--muted);
+    }
+    .param-chip strong{color:var(--orange2)}
+    .result-explain{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:14px}
+    .result-explain strong{color:var(--text)}
+    .module-box{
+      padding:12px 16px;border-radius:var(--radius);
+      background:#070b10;border:1px solid var(--border);
+      border-left:3px solid var(--orange);
+      font-size:13px;color:var(--muted);margin-bottom:10px;
+    }
+    .module-box strong{color:var(--orange2)}
+    .table-ref{
+      font-size:11px;color:var(--muted);padding:8px 12px;
+      background:#070b10;border-radius:3px;border:1px solid var(--border);
+      letter-spacing:.2px;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar{display:flex;flex-direction:column;gap:16px}
+
+    .cat-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cat-table th{
+      font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+      color:var(--muted);padding:8px 12px;text-align:left;
+      border-bottom:1px solid var(--border);
+    }
+    .cat-table td{padding:10px 12px;border-bottom:1px solid rgba(30,45,66,.5);vertical-align:top;color:var(--muted)}
+    .cat-table tr:last-child td{border-bottom:none}
+    .cat-table .cat-pill{
+      display:inline-block;padding:2px 8px;border-radius:3px;
+      font-weight:700;font-size:12px;color:#0a0e14;
+    }
+    .pill-sep {background:var(--green)}
+    .pill-c1  {background:var(--blue)}
+    .pill-c2  {background:var(--yellow)}
+    .pill-c3  {background:var(--orange)}
+    .pill-c4  {background:var(--red)}
+
+    .disclaimer-box{
+      padding:14px 16px;border-radius:var(--radius);
+      background:var(--panel);border:1px solid var(--border);
+      border-left:3px solid var(--orange);
+      font-size:12px;color:var(--muted);line-height:1.65;
+    }
+    .disclaimer-box strong{color:var(--orange)}
+
+    /* ── FOOTER ── */
+    .footer{
+      border-top:1px solid var(--border);margin-top:10px;
+      background:var(--nav);padding:20px 0;
+    }
+    .footer-inner{
+      max-width:1100px;margin:0 auto;padding:0 24px;
+      display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
+      font-size:12px;color:var(--muted);
+    }
+    .footer-inner strong{color:var(--text)}
+
+    @media(max-width:900px){
+      .main-layout{grid-template-columns:1fr}
+    }
+    @media(max-width:600px){
+      .field-row{grid-template-columns:1fr}
+      .field-full{grid-column:1}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="logo-icon">PED</div>
+      <div>
+        Pressure Equipment Classifier
+        <span class="logo-sub">Directive 2014/68/EU</span>
+      </div>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-tag">Annex II · Tables 1–8</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="wrap">
+    <h1>PED <span>2014/68/EU</span> — Equipment Category Classifier</h1>
+    <p class="hero-sub">
+      Determine the conformity assessment category for pressure vessels and piping based on
+      Annex II classification tables of Directive 2014/68/EU (Pressure Equipment Directive).
+    </p>
+    <div class="hero-meta">
+      <span class="tag"><span class="dot dot-orange"></span>Vessels: Tables 1–4</span>
+      <span class="tag"><span class="dot dot-orange"></span>Piping: Tables 5–8</span>
+      <span class="tag"><span class="dot dot-green"></span>Categories I – IV</span>
+      <span class="tag"><span class="dot dot-green"></span>Article 4(3) — SEP</span>
+    </div>
+  </div>
+</div>
+
+<!-- INFO STRIP -->
+<div class="info-strip">
+  <div class="info-cell">
+    <h3>Fluid Group 1</h3>
+    <p>Dangerous: flammable, explosive, oxidising, acutely toxic, or TS > 350 °C for steam/gas.</p>
+  </div>
+  <div class="info-cell">
+    <h3>Fluid Group 2</h3>
+    <p>All fluids not classified Group 1 — e.g. water, air, nitrogen, non-toxic refrigerants.</p>
+  </div>
+  <div class="info-cell">
+    <h3>PS — Max. Allowable Pressure</h3>
+    <p>Gauge pressure in bar. Equipment with PS ≤ 0.5 bar is excluded from PED scope (Art. 1.6).</p>
+  </div>
+  <div class="info-cell">
+    <h3>Key Parameters</h3>
+    <p>Vessels: <strong>PS × V</strong> (bar·L). Piping: <strong>PS × DN</strong> (bar·mm).</p>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+
+  <!-- LEFT: FORM + RESULT -->
+  <div>
+    <div class="panel" style="margin-bottom:20px">
+      <div class="panel-head">
+        <div class="accent-bar"></div>
+        <h2>Input Parameters</h2>
+      </div>
+      <div class="panel-body">
+        <div class="field-row">
+          <div class="field">
+            <label for="eqType">Equipment type</label>
+            <select id="eqType">
+              <option value="vessel">Pressure vessel</option>
+              <option value="piping">Piping assembly</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fluidState">Fluid state</label>
+            <select id="fluidState">
+              <option value="gas">Gas / vapour</option>
+              <option value="liquid">Liquid</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field field-full">
+            <label for="fluidGroup">Fluid group</label>
+            <select id="fluidGroup">
+              <option value="1">Group 1 — Dangerous fluid (flammable / toxic / oxidising / explosive)</option>
+              <option value="2">Group 2 — Non-dangerous fluid (water / air / nitrogen / steam ≤ 350 °C)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="separator"></div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="ps">Max allowable pressure PS (bar g)</label>
+            <input type="number" id="ps" min="0" step="any" placeholder="e.g.  16"/>
+          </div>
+
+          <div class="field" id="fV">
+            <label for="vol">Volume V (litres)</label>
+            <input type="number" id="vol" min="0" step="any" placeholder="e.g.  500"/>
+          </div>
+          <div class="field" id="fDN" style="display:none">
+            <label for="dn">Nominal diameter DN (mm)</label>
+            <input type="number" id="dn" min="0" step="any" placeholder="e.g.  150"/>
+          </div>
+        </div>
+
+        <button class="btn-classify" onclick="classify()">Run Classification</button>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="panel result-panel" id="result">
+      <div class="panel-head">
+        <div class="accent-bar"></div>
+        <h2>Classification Result</h2>
+      </div>
+      <div class="cat-banner" id="catBanner">
+        <div class="cat-icon" id="catIcon"></div>
+        <div class="cat-text" id="catText"></div>
+      </div>
+      <div class="result-body">
+        <div class="params-row" id="paramsRow"></div>
+        <div class="result-explain" id="explain"></div>
+        <div class="module-box" id="moduleBox" style="display:none"></div>
+        <div class="table-ref" id="tableRef"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: SIDEBAR -->
+  <div class="sidebar">
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="accent-bar"></div>
+        <h2>Category Reference</h2>
+      </div>
+      <div class="panel-body" style="padding:0">
+        <table class="cat-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Conformity assessment module</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="cat-pill pill-sep">Art. 4(3)</span></td>
+              <td>Sound Engineering Practice — no CE marking required</td>
+            </tr>
+            <tr>
+              <td><span class="cat-pill pill-c1">Cat I</span></td>
+              <td>Module A — Internal production control (manufacturer)</td>
+            </tr>
+            <tr>
+              <td><span class="cat-pill pill-c2">Cat II</span></td>
+              <td>Module A2, D1, or E1 — Notified Body surveillance</td>
+            </tr>
+            <tr>
+              <td><span class="cat-pill pill-c3">Cat III</span></td>
+              <td>Module B+D / B+F / B+E / B+C2 / H / H1 — NB required</td>
+            </tr>
+            <tr>
+              <td><span class="cat-pill pill-c4">Cat IV</span></td>
+              <td>Module B+D / B+F / G / H1 — highest conformity level</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="accent-bar"></div>
+        <h2>Annex II Table Index</h2>
+      </div>
+      <div class="panel-body" style="padding:0">
+        <table class="cat-table">
+          <thead><tr><th>Table</th><th>Applies to</th></tr></thead>
+          <tbody>
+            <tr><td>Table 1</td><td>Vessels · Group 1 · Gas/vapour</td></tr>
+            <tr><td>Table 2</td><td>Vessels · Group 2 · Gas/vapour</td></tr>
+            <tr><td>Table 3</td><td>Vessels · Group 1 · Liquid</td></tr>
+            <tr><td>Table 4</td><td>Vessels · Group 2 · Liquid</td></tr>
+            <tr><td>Table 5</td><td>Piping · Group 1 · Gas/vapour</td></tr>
+            <tr><td>Table 6</td><td>Piping · Group 2 · Gas/vapour</td></tr>
+            <tr><td>Table 7</td><td>Piping · Group 1 · Liquid</td></tr>
+            <tr><td>Table 8</td><td>Piping · Group 2 · Liquid</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="disclaimer-box">
+      <strong>Disclaimer</strong> — This tool provides indicative guidance only, based on numerical approximations of the graphical charts in Annex II of Directive 2014/68/EU. Results do not constitute a formal conformity assessment. Always verify classification with the official directive text and consult a Notified Body where required.
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <strong>PED 2014/68/EU Classifier</strong> — Pressure Equipment Directive
+    </div>
+    <div>Reference: Directive 2014/68/EU · Annex II, Tables 1–8 · Official Journal of the EU</div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('eqType').addEventListener('change', function(){
+  const v = this.value === 'vessel';
+  document.getElementById('fV').style.display  = v ? '' : 'none';
+  document.getElementById('fDN').style.display = v ? 'none' : '';
+});
+
+const CFG = {
+  out:  { cls:'b-out',  icon:'—',  label:'Not Subject to PED',              sub:'PS ≤ 0.5 bar — excluded from Directive 2014/68/EU scope (Article 1.6).' },
+  art4: { cls:'b-sep',  icon:'SEP',label:'Article 4(3) — Sound Engineering Practice', sub:'No CE marking required. Equipment must still be designed and manufactured safely.' },
+  cat1: { cls:'b-cat1', icon:'I',  label:'Category I',                      sub:'Module A — Internal production control. Manufacturer self-declaration.' },
+  cat2: { cls:'b-cat2', icon:'II', label:'Category II',                     sub:'Module A2, D1, or E1. Notified Body surveillance or assessment required.' },
+  cat3: { cls:'b-cat3', icon:'III',label:'Category III',                    sub:'Modules B+D / B+F / B+E / B+C2 / H / H1. Full Notified Body involvement required.' },
+  cat4: { cls:'b-cat4', icon:'IV', label:'Category IV',                     sub:'Modules B+D / B+F / G / H1. Highest conformity assessment level.' },
+};
+
+const MODULES = {
+  art4:null, out:null,
+  cat1:'Conformity assessment module: <strong>Module A</strong> (internal production control — manufacturer).',
+  cat2:'Conformity assessment module: <strong>Module A2, D1, or E1</strong>. Notified Body surveillance required.',
+  cat3:'Conformity assessment module: <strong>Module B+D, B+F, B+E, B+C2, H, or H1</strong>. Notified Body required.',
+  cat4:'Conformity assessment module: <strong>Module B+D, B+F, G, or H1</strong>. Notified Body required (highest level).',
+};
+
+function fmt(n){ return n>=1000 ? n.toLocaleString('en',{maximumFractionDigits:0}) : parseFloat(n.toFixed(2)).toString(); }
+
+function classify(){
+  const eqType     = document.getElementById('eqType').value;
+  const fluidGroup = parseInt(document.getElementById('fluidGroup').value);
+  const fluidState = document.getElementById('fluidState').value;
+  const ps  = parseFloat(document.getElementById('ps').value);
+  const vol = parseFloat(document.getElementById('vol').value);
+  const dn  = parseFloat(document.getElementById('dn').value);
+
+  if(isNaN(ps)||ps<0){ alert('Please enter a valid PS value (bar gauge ≥ 0).'); return; }
+  if(eqType==='vessel'&&(isNaN(vol)||vol<=0)){ alert('Please enter a valid Volume V (litres > 0).'); return; }
+  if(eqType==='piping'&&(isNaN(dn)||dn<=0)){ alert('Please enter a valid nominal diameter DN (mm > 0).'); return; }
+
+  let cat, explain, tableRef;
+
+  /* ── OUT OF SCOPE ── */
+  if(ps<=0.5){
+    cat='out';
+    explain='PS = <strong>'+ps+' bar</strong> ≤ 0.5 bar — this equipment is excluded from the scope of Directive 2014/68/EU per Article 1(6). No PED conformity assessment required.';
+    tableRef='PED 2014/68/EU — Article 1(6): exclusion for PS ≤ 0.5 bar';
+    render(cat, explain, tableRef, eqType, fluidGroup, fluidState, ps, vol, dn); return;
+  }
+
+  /* ── VESSELS ── */
+  if(eqType==='vessel'){
+    const psv=ps*vol;
+    if(fluidState==='gas'){
+      if(fluidGroup===1){
+        tableRef='Annex II, Table 1 — Vessels · Group 1 fluids · Gas/vapour';
+        if(psv<=25){ cat='art4'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong> ≤ 25 bar·L → Article 4(3) applies. Sound Engineering Practice sufficient.'; }
+        else if(psv<=200&&ps<=200){ cat='cat1'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong> (25 – 200 bar·L), PS ≤ 200 bar → <strong>Category I</strong>.'; }
+        else if(psv<=1000){ cat='cat2'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong> (200 – 1,000 bar·L) → <strong>Category II</strong>.'; }
+        else if(psv<=3000||vol<=1){ cat='cat3'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong>'+(vol<=1?', V ≤ 1 L':' (1,000 – 3,000 bar·L)')+' → <strong>Category III</strong>.'; }
+        else{ cat='cat4'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong> > 3,000 bar·L, V > 1 L → <strong>Category IV</strong>.'; }
+        if(ps>1000&&cat!=='cat4'){ cat='cat3'; explain+=' <em>(PS > 1,000 bar overrides to Category III minimum.)</em>'; }
+      } else {
+        tableRef='Annex II, Table 2 — Vessels · Group 2 fluids · Gas/vapour (e.g. steam, compressed air)';
+        if(psv<=50){ cat='art4'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong> ≤ 50 bar·L → Article 4(3). Sound Engineering Practice.'; }
+        else if(psv<=200){ cat='cat1'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong> (50 – 200 bar·L) → <strong>Category I</strong>.'; }
+        else if(psv<=1000){ cat='cat2'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong> (200 – 1,000 bar·L) → <strong>Category II</strong>.'; }
+        else{ cat=vol>1?'cat3':'cat2'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong> > 1,000 bar·L, V '+(vol>1?'> 1 L → <strong>Category III</strong>.':'≤ 1 L → <strong>Category II</strong>.'); }
+      }
+    } else {
+      if(fluidGroup===1){
+        tableRef='Annex II, Table 3 — Vessels · Group 1 fluids · Liquid';
+        const psv=ps*vol;
+        if(ps<=10||psv<=200){ cat='art4'; explain=(ps<=10?'PS ≤ 10 bar':'PS × V = <strong>'+fmt(psv)+' bar·L</strong> ≤ 200 bar·L')+' → Article 4(3).'; }
+        else if(psv<=500){ cat='cat1'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong> (200 – 500 bar·L), PS > 10 bar → <strong>Category I</strong>.'; }
+        else if(psv<=1000){ cat='cat2'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong> (500 – 1,000 bar·L) → <strong>Category II</strong>.'; }
+        else{ cat='cat3'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong> > 1,000 bar·L → <strong>Category III</strong>.'; }
+      } else {
+        tableRef='Annex II, Table 4 — Vessels · Group 2 fluids · Liquid (e.g. water, hydraulic oil)';
+        const psv=ps*vol;
+        if(ps<=10||psv<=1000){ cat='art4'; explain=(ps<=10?'PS ≤ 10 bar':'PS × V = <strong>'+fmt(psv)+' bar·L</strong> ≤ 1,000 bar·L')+' → Article 4(3).'; }
+        else if(psv<=10000){ cat='cat1'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong> (1,000 – 10,000 bar·L), PS > 10 bar → <strong>Category I</strong>.'; }
+        else{ cat='cat2'; explain='PS × V = <strong>'+fmt(psv)+' bar·L</strong> > 10,000 bar·L → <strong>Category II</strong>.'; }
+      }
+    }
+
+  /* ── PIPING ── */
+  } else {
+    const psdn=ps*dn;
+    if(fluidState==='gas'){
+      if(fluidGroup===1){
+        tableRef='Annex II, Table 5 — Piping · Group 1 fluids · Gas/vapour';
+        if(dn<=25){ cat='art4'; explain='DN = <strong>'+dn+' mm</strong> ≤ 25 mm → Article 4(3) applies (DN threshold, regardless of PS).'; }
+        else if(psdn<=2000){ cat='cat1'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> ≤ 2,000, DN > 25 mm → <strong>Category I</strong>.'; }
+        else if(psdn<=5000){ cat='cat2'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> (2,000 – 5,000 bar·mm) → <strong>Category II</strong>.'; }
+        else{ cat='cat3'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> > 5,000 bar·mm → <strong>Category III</strong>.'; }
+      } else {
+        tableRef='Annex II, Table 6 — Piping · Group 2 fluids · Gas/vapour (e.g. steam, instrument air)';
+        if(dn<=32||(ps<=10&&dn<=200)){ cat='art4'; explain=(dn<=32?'DN ≤ 32 mm':('PS ≤ 10 bar and DN ≤ 200 mm'))+' → Article 4(3).'; }
+        else if(psdn<=3500){ cat='cat1'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> ≤ 3,500 bar·mm → <strong>Category I</strong>.'; }
+        else if(psdn<=5000){ cat='cat2'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> (3,500 – 5,000 bar·mm) → <strong>Category II</strong>.'; }
+        else{ cat='cat3'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> > 5,000 bar·mm → <strong>Category III</strong>.'; }
+      }
+    } else {
+      if(fluidGroup===1){
+        tableRef='Annex II, Table 7 — Piping · Group 1 fluids · Liquid';
+        if(ps<=25||psdn<=2000){ cat='art4'; explain=(ps<=25?'PS ≤ 25 bar':'PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> ≤ 2,000')+' → Article 4(3).'; }
+        else if(psdn<=5000){ cat='cat2'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> (2,000 – 5,000 bar·mm), PS > 25 bar → <strong>Category II</strong>.'; }
+        else{ cat='cat3'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> > 5,000 bar·mm → <strong>Category III</strong>.'; }
+      } else {
+        tableRef='Annex II, Table 8 — Piping · Group 2 fluids · Liquid (e.g. cooling water, hydraulic)';
+        if(ps<=10||psdn<=5000){ cat='art4'; explain=(ps<=10?'PS ≤ 10 bar':'PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> ≤ 5,000')+' → Article 4(3).'; }
+        else{ cat='cat1'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> > 5,000, PS > 10 bar → <strong>Category I</strong>.'; }
+      }
+    }
+  }
+
+  render(cat, explain, tableRef, eqType, fluidGroup, fluidState, ps, vol, dn);
+}
+
+function render(cat, explain, tableRef, eqType, fluidGroup, fluidState, ps, vol, dn){
+  const cfg = CFG[cat];
+  const el  = document.getElementById('result');
+
+  el.className = 'panel result-panel show';
+
+  const banner = document.getElementById('catBanner');
+  banner.className = 'cat-banner '+cfg.cls;
+  document.getElementById('catIcon').textContent = cfg.icon;
+  document.getElementById('catText').innerHTML =
+    '<h3>'+cfg.label+'</h3><p>'+cfg.sub+'</p>';
+
+  /* params */
+  const chips=[];
+  chips.push('<span class="param-chip">Type: <strong>'+(eqType==='vessel'?'Vessel':'Piping')+'</strong></span>');
+  chips.push('<span class="param-chip">Fluid: <strong>Group '+fluidGroup+' '+fluidState+'</strong></span>');
+  chips.push('<span class="param-chip">PS: <strong>'+ps+' bar</strong></span>');
+  if(eqType==='vessel'){
+    chips.push('<span class="param-chip">V: <strong>'+vol+' L</strong></span>');
+    chips.push('<span class="param-chip">PS×V: <strong>'+fmt(ps*vol)+' bar·L</strong></span>');
+  } else {
+    chips.push('<span class="param-chip">DN: <strong>'+dn+' mm</strong></span>');
+    chips.push('<span class="param-chip">PS×DN: <strong>'+fmt(ps*dn)+' bar·mm</strong></span>');
+  }
+  document.getElementById('paramsRow').innerHTML = chips.join('');
+  document.getElementById('explain').innerHTML   = explain;
+  document.getElementById('tableRef').textContent = tableRef ? 'Reference: '+tableRef : '';
+
+  const mbox = document.getElementById('moduleBox');
+  const m = MODULES[cat];
+  if(m){ mbox.style.display=''; mbox.innerHTML=m; } else { mbox.style.display='none'; }
+
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+</script>
+</body>
+</html>
