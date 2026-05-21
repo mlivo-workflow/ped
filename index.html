@@ -571,27 +571,27 @@ function classify(){
     if(fluidState==='gas'){
       if(fluidGroup===1){
         tableRef='Annex II, Table 6 — Piping · Group 1 fluids · Gas/vapour';
-        if(dn<=25){ cat='art4'; explain='DN = <strong>'+dn+' mm</strong> ≤ 25 mm → Article 4(3) applies (DN threshold, regardless of PS).'; }
-        else if(psdn<=2000){ cat='cat1'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> ≤ 2,000, DN > 25 mm → <strong>Category I</strong>.'; }
-        else if(psdn<=5000){ cat='cat2'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> (2,000 – 5,000 bar·mm) → <strong>Category II</strong>.'; }
-        else{ cat='cat3'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> > 5,000 bar·mm → <strong>Category III</strong>.'; }
+        if(dn<=25){ cat='art4'; explain='DN = <strong>'+dn+' mm</strong> ≤ 25 mm → Article 4(3) applies.'; }
+        else if(dn<=100&&psdn<=1000){ cat='cat1'; explain='DN ≤ 100 mm and PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> ≤ 1,000 → <strong>Category I</strong>.'; }
+        else if(dn<=350&&psdn<=3500){ cat='cat2'; explain='DN ≤ 350 mm and PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> ≤ 3,500 → <strong>Category II</strong>.'; }
+        else{ cat='cat3'; explain='DN > 350 mm or PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> > 3,500 → <strong>Category III</strong>.'; }
       } else {
         tableRef='Annex II, Table 7 — Piping · Group 2 fluids · Gas/vapour (e.g. steam, instrument air)';
-        if(dn<=32||(ps<=10&&dn<=200)){ cat='art4'; explain=(dn<=32?'DN ≤ 32 mm':('PS ≤ 10 bar and DN ≤ 200 mm'))+' → Article 4(3).'; }
+        if(dn<=32&&psdn<=1000){ cat='art4'; explain='DN ≤ 32 mm and PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> ≤ 1,000 → Article 4(3).'; }
         else if(psdn<=3500){ cat='cat1'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> ≤ 3,500 bar·mm → <strong>Category I</strong>.'; }
-        else if(psdn<=5000){ cat='cat2'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> (3,500 – 5,000 bar·mm) → <strong>Category II</strong>.'; }
-        else{ cat='cat3'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> > 5,000 bar·mm → <strong>Category III</strong>.'; }
+        else if(dn>250&&psdn>5000){ cat='cat3'; explain='DN > 250 mm and PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> > 5,000 → <strong>Category III</strong>.'; }
+        else{ cat='cat2'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> (3,500 – 5,000 bar·mm) → <strong>Category II</strong>.'; }
       }
     } else {
       if(fluidGroup===1){
         tableRef='Annex II, Table 8 — Piping · Group 1 fluids · Liquid';
-        if(ps<=25||psdn<=2000){ cat='art4'; explain=(ps<=25?'PS ≤ 25 bar':'PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> ≤ 2,000')+' → Article 4(3).'; }
-        else if(psdn<=5000){ cat='cat2'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> (2,000 – 5,000 bar·mm), PS > 25 bar → <strong>Category II</strong>.'; }
-        else{ cat='cat3'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> > 5,000 bar·mm → <strong>Category III</strong>.'; }
+        if(dn<=25||psdn<=2000){ cat='art4'; explain=(dn<=25?'DN = <strong>'+dn+' mm</strong> ≤ 25 mm':'PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> ≤ 2,000')+' → Article 4(3).'; }
+        else if(ps<=10){ cat='cat1'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> > 2,000, PS = <strong>'+ps+' bar</strong> ≤ 10 bar → <strong>Category I</strong>.'; }
+        else{ cat='cat2'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> > 2,000, PS > 10 bar → <strong>Category II</strong>. (Max. category for Group 1 liquid piping.)'; }
       } else {
         tableRef='Annex II, Table 9 — Piping · Group 2 fluids · Liquid (e.g. cooling water, hydraulic)';
-        if(ps<=10||psdn<=5000){ cat='art4'; explain=(ps<=10?'PS ≤ 10 bar':'PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> ≤ 5,000')+' → Article 4(3).'; }
-        else{ cat='cat1'; explain='PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> > 5,000, PS > 10 bar → <strong>Category I</strong>.'; }
+        if(dn<=200&&psdn<=5000){ cat='art4'; explain='DN ≤ 200 mm and PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> ≤ 5,000 → Article 4(3).'; }
+        else{ cat='cat1'; explain='DN > 200 mm or PS × DN = <strong>'+fmt(psdn)+' bar·mm</strong> > 5,000 → <strong>Category I</strong>. (Max. category for Group 2 liquid piping.)'; }
       }
     }
   }
