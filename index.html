@@ -132,7 +132,7 @@
       font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
       color:var(--muted);
     }
-    .field select,.field input[type=number]{
+    .field select,.field input[type=number],.field input[type=text]{
       background:#070b10;
       border:1px solid var(--border);border-radius:var(--radius);
       color:var(--text);padding:10px 12px;font-size:14px;
@@ -257,6 +257,55 @@
     }
     .footer-inner strong{color:var(--text)}
 
+    /* Report form */
+    #reportForm{display:none}
+    .btn-pdf{
+      width:100%;padding:13px;border-radius:var(--radius);
+      background:linear-gradient(135deg,#217a50,#185f3c);color:#fff;
+      font-weight:700;font-size:15px;letter-spacing:.3px;
+      border:none;cursor:pointer;font-family:inherit;
+      transition:filter .15s;margin-top:6px;
+    }
+    .btn-pdf:hover{filter:brightness(1.1)}
+    /* Print */
+    @media print{
+      *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      body{background:#fff!important;color:#111!important;font-size:12px!important}
+      .nav,.hero,.info-strip,.main-layout,.footer{display:none!important}
+      #printArea{display:block!important;padding:0}
+      .pr-doc{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;color:#111;line-height:1.5}
+      .pr-header{display:flex;justify-content:space-between;align-items:flex-end;
+        padding-bottom:10px;margin-bottom:16px;border-bottom:3px solid #1a3a6b}
+      .pr-title{font-size:18px;font-weight:700;color:#1a3a6b}
+      .pr-dir{font-size:10px;color:#666;margin-top:3px;letter-spacing:.3px}
+      .pr-company{font-size:12px;font-weight:400;color:#555;text-align:right;line-height:1.6}
+      .pr-meta{width:100%;border-collapse:collapse;margin-bottom:16px}
+      .pr-meta th{background:#eef2f8;font-weight:600;color:#333;padding:5px 10px;
+        text-align:left;border:1px solid #c8d3e0;font-size:11px;width:20%}
+      .pr-meta td{padding:5px 10px;border:1px solid #c8d3e0;color:#111;font-size:12px}
+      .pr-sec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;
+        color:#1a3a6b;border-bottom:1px solid #c8d3e0;padding-bottom:3px;margin:14px 0 8px}
+      .pr-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+      .pr-chips .param-chip{font-size:11px;padding:3px 8px;background:#f4f6fb;
+        border:1px solid #c8d3e0;border-radius:3px;color:#111}
+      .pr-chips .param-chip strong{color:#1a3a6b}
+      .pr-result{padding:12px 16px;border-left:5px solid #aaa;background:#f8f9fc;margin-bottom:10px}
+      .pr-cat{font-size:17px;font-weight:800;margin-bottom:5px}
+      .pr-expl{font-size:12px;color:#333;line-height:1.65}
+      .pr-expl strong{color:#1a3a6b}
+      .pr-mod{font-size:11px;color:#555;margin-top:8px;padding-top:7px;border-top:1px solid #ddd}
+      .pr-mod strong{color:#1a3a6b}
+      .pr-ref{font-size:10px;color:#777;font-style:italic;margin-bottom:12px}
+      .pr-result.prc-sep{border-left-color:#4a9a4a}.pr-result.prc-sep .pr-cat{color:#2a6a2a}
+      .pr-result.prc-c1{border-left-color:#2a7abf}.pr-result.prc-c1 .pr-cat{color:#1a5a9a}
+      .pr-result.prc-c2{border-left-color:#9a8a20}.pr-result.prc-c2 .pr-cat{color:#6a6010}
+      .pr-result.prc-c3{border-left-color:#c07020}.pr-result.prc-c3 .pr-cat{color:#8a4f10}
+      .pr-result.prc-c4{border-left-color:#bf2a2a}.pr-result.prc-c4 .pr-cat{color:#8a1010}
+      .pr-disc{font-size:9.5px;color:#666;border-top:1px solid #c8d3e0;
+        padding-top:10px;margin-top:16px;line-height:1.55}
+      .pr-foot{font-size:9px;color:#999;text-align:center;margin-top:8px;
+        padding-top:6px;border-top:1px dotted #ddd}
+    }
     @media(max-width:900px){
       .main-layout{grid-template-columns:1fr}
     }
@@ -397,6 +446,29 @@
         <div class="table-ref" id="tableRef"></div>
       </div>
     </div>
+
+    <!-- Report form (shown after classification) -->
+    <div class="panel" id="reportForm" style="margin-top:16px">
+      <div class="panel-head">
+        <div class="accent-bar"></div>
+        <h2>Generate PDF Report</h2>
+      </div>
+      <div class="panel-body">
+        <div class="field-row">
+          <div class="field"><label>Prepared by (Ersteller)</label><input type="text" id="rp_name" placeholder="Your name"/></div>
+          <div class="field"><label>Date (Datum)</label><input type="text" id="rp_date"/></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Project (Projekt)</label><input type="text" id="rp_proj" placeholder="Project name / number"/></div>
+          <div class="field"><label>Revision</label><input type="text" id="rp_rev" placeholder="e.g. A0"/></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Line / Equipment No.</label><input type="text" id="rp_line" placeholder="e.g. P-100-001-AA1"/></div>
+          <div class="field"><label>Notes (optional)</label><input type="text" id="rp_notes" placeholder="Additional remarks"/></div>
+        </div>
+        <button class="btn-pdf" onclick="generatePDF()">↓&nbsp; Save as PDF</button>
+      </div>
+    </div>
   </div>
 
   <!-- RIGHT: SIDEBAR -->
@@ -470,6 +542,8 @@
 
   </div>
 </div>
+
+<div id="printArea" style="display:none;padding:24px 28px"></div>
 
 <!-- FOOTER -->
 <footer class="footer">
@@ -632,6 +706,69 @@ function render(cat, explain, tableRef, eqType, fluidGroup, fluidState, ps, vol,
   if(m){ mbox.style.display=''; mbox.innerHTML=m; } else { mbox.style.display='none'; }
 
   el.scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  // Store data for PDF report
+  window._rpt = {
+    cat, label:cfg.label, bodyHTML:explain, refText:tableRef,
+    modHTML: MODULES[cat] || '',
+    paramsHTML: chips.join('')
+  };
+
+  // Show report form + auto-fill date
+  const rf = document.getElementById('reportForm');
+  rf.style.display = '';
+  const rd = document.getElementById('rp_date');
+  if(!rd.value) rd.value = new Date().toLocaleDateString('de-AT',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+
+function generatePDF(){
+  if(!window._rpt){ alert('Please run a classification first.'); return; }
+  const {cat, label, bodyHTML, refText, modHTML, paramsHTML} = window._rpt;
+
+  const name  = document.getElementById('rp_name').value.trim() || '—';
+  const date  = document.getElementById('rp_date').value.trim()  || new Date().toLocaleDateString('de-AT',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const proj  = document.getElementById('rp_proj').value.trim() || '—';
+  const rev   = document.getElementById('rp_rev').value.trim()  || '—';
+  const line  = document.getElementById('rp_line').value.trim() || '—';
+  const notes = document.getElementById('rp_notes').value.trim() || '—';
+
+  const prcMap = {art4:'prc-sep',cat1:'prc-c1',cat2:'prc-c2',cat3:'prc-c3',cat4:'prc-c4',out:'prc-out'};
+  const prc = prcMap[cat] || '';
+
+  document.getElementById('printArea').innerHTML = `
+<div class="pr-doc">
+  <div class="pr-header">
+    <div>
+      <div class="pr-title">PED 2014/68/EU — Classification Report</div>
+      <div class="pr-dir">Directive 2014/68/EU · Pressure Equipment · Annex II Classification</div>
+    </div>
+    <div class="pr-company">Pressure Equipment Classifier<br/>Directive 2014/68/EU</div>
+  </div>
+
+  <table class="pr-meta">
+    <tr><th>Prepared by</th><td>${name}</td><th>Date</th><td>${date}</td></tr>
+    <tr><th>Project</th><td>${proj}</td><th>Revision</th><td>${rev}</td></tr>
+    <tr><th>Line / Equip. No.</th><td>${line}</td><th>Notes</th><td>${notes}</td></tr>
+  </table>
+
+  <div class="pr-sec">Input Parameters</div>
+  <div class="pr-chips">${paramsHTML}</div>
+
+  <div class="pr-sec">Classification Result</div>
+  <div class="pr-result ${prc}">
+    <div class="pr-cat">${label}</div>
+    <div class="pr-expl">${bodyHTML}</div>
+    ${modHTML ? '<div class="pr-mod">'+modHTML+'</div>' : ''}
+  </div>
+  ${refText ? '<div class="pr-ref">Reference: '+refText+'</div>' : ''}
+
+  <div class="pr-disc">
+    <strong>Disclaimer:</strong> This report provides indicative guidance only, based on numerical approximations of the graphical charts in Annex II of Directive 2014/68/EU. It does not constitute a formal conformity assessment and cannot replace professional engineering judgement or consultation with a Notified Body. Always verify classification against the official directive text and consult a Notified Body where required.
+  </div>
+  <div class="pr-foot">Generated by PED 2014/68/EU Classifier &nbsp;|&nbsp; Not a substitute for professional assessment</div>
+</div>`;
+
+  window.print();
 }
 </script>
 </body>
